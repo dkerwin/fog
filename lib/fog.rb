@@ -45,4 +45,5 @@ require 'fog/xenserver'
 require 'fog/zerigo'
 require 'fog/cloudsigma'
 require 'fog/openvz'
+require 'fog/profitbricks'
 
