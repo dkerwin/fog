@@ -6,11 +6,13 @@ module Fog
     class ProfitBricks < Fog::Service
 
       requires :profitbricks_password, :profitbricks_username
-      #recognizes :host, :port, :scheme, :persistent
+      recognizes :host, :port, :scheme, :persistent
 
       model_path 'fog/profitbricks/models/compute'
-      model       :datacenter
-      collection  :datacenters
+      model      :datacenter
+      collection :datacenters
+      model      :server
+      collection :servers
 
       request_path 'fog/profitbricks/requests/compute'
       request :list_datacenters
@@ -20,6 +22,8 @@ module Fog
       request :delete_datacenter
       request :clear_datacenter
       request :update_datacenter
+
+      request :get_server
 
       class Mock
 
@@ -69,8 +73,8 @@ module Fog
         def request(params)
           key = "#{@profitbricks_username}:#{@profitbricks_password}"
           params[:headers] = { "Authorization" => "Basic #{Base64.encode64(key).delete("\r\n")}", 
-                               "Content-Type"  => "text/xml",
-                               "Accept"        => "text/xml",
+                               "Content-Type"  => "text/xml;charset=utf-8",
+                               "Accept"        => "text/xml;charset=utf-8",
                              }
 
           body = <<-EOI
@@ -91,7 +95,7 @@ EOI
           rescue Excon::Errors::HTTPStatusError => error
             raise case error
             when Excon::Errors::NotFound
-              Fog::Compute::BareMetalCloud::NotFound.slurp(error)
+              Fog::Compute::ProfitBricks::NotFound.slurp(error)
             else
               error
             end

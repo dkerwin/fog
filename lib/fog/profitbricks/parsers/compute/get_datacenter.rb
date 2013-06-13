@@ -6,6 +6,8 @@ module Fog
         class GetDatacenter < Fog::Parsers::Base
 
           def reset
+            @servers  = []
+            @storages = []
             @response = {}
           end
 
@@ -13,6 +15,15 @@ module Fog
             case name
             when 'dataCenterId', 'dataCenterName', 'dataCenterVersion', 'provisioningState', 'region'
               @response[name] = value
+            when 'serverId'
+              @servers << value
+            when 'storageId'
+              @storages << value
+            when 'return'
+              @response['servers'] = @servers.uniq!
+              @response['storages'] = @storages.uniq!
+              @servers  = []
+              @storages = []
             end
           end
 

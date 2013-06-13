@@ -6,7 +6,7 @@ module Fog
 
       class Datacenter < Fog::Model
 
-        identity :id,        :aliases => 'dataCenterId'
+        identity  :id,       :aliases => 'dataCenterId'
         
         attribute :name,     :aliases => 'dataCenterName'
         attribute :version,  :aliases => 'dataCenterVersion'
@@ -42,6 +42,16 @@ module Fog
 
         def ready?
           self.state == 'AVAILABLE'
+        end
+
+        def servers
+          requires :id
+          service.get_datacenter(id).body['servers']
+        end
+
+        def storages
+          requires :id
+          service.get_datacenter(id).body['storages']
         end
         
       end
