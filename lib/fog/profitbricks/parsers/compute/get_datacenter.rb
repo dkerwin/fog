@@ -20,8 +20,8 @@ module Fog
             when 'storageId'
               @storages << value
             when 'return'
-              @response['servers'] = @servers.uniq!
-              @response['storages'] = @storages.uniq!
+              @response['servers'] = @servers.uniq
+              @response['storages'] = @storages.uniq
               @servers  = []
               @storages = []
             end

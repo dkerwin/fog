@@ -1,31 +1,31 @@
-require 'fog/core/model'
+require 'fog/compute/models/server'
 
 module Fog
   module Compute
     class ProfitBricks
 
-      class Server < Fog::Model
+      class Server < Fog::Compute::Server
 
-        identity  :id,        :aliases => 'serverId'
+        identity  :id,          :aliases => 'serverId'
         
-        attribute :name,      :aliases => 'serverName'
-        attribute :created,   :aliases => 'creationTime'
-        attribute :modified,  :aliases => 'lastModificationTime'
-        attribute :state,     :aliases => 'provisioningState'
-        attribute :zone,      :aliases => 'availabilityZone'
-        attribute :os_type,   :aliases => 'osType'
+        attribute :name,        :aliases => 'serverName'
+        attribute :created,     :aliases => 'creationTime'
+        attribute :modified,    :aliases => 'lastModificationTime'
+        attribute :state,       :aliases => 'provisioningState'
+        attribute :zone,        :aliases => 'availabilityZone'
+        attribute :os_type,     :aliases => 'osType'
         
-        attribute :vm_state,  :aliases => 'virtualMachineState'
+        attribute :vm_state,    :aliases => 'virtualMachineState'
         attribute :cores
         attribute :ram
 
-        attribute :online,    :aliases => 'internetAccess'
-        attribute :ips,       :type => :array
+        attribute :online,      :aliases => 'internetAccess', :type => :boolean
+        attribute :ips,         :type => :array
 
         attribute :storage_ids, :aliases => 'storageId', :type => :array
-        attribute :romdrives, :aliases => 'romDrives'
+        attribute :rom_drives,  :aliases => 'romDrives'
 
-        attribute :request_id, :aliases => 'requestId'
+        attribute :request_id,  :aliases => 'requestId'
 
         def save
           requires :name
@@ -56,6 +56,42 @@ module Fog
 
         def ready?
           self.state == 'AVAILABLE'
+        end
+
+        def start
+          requires :id
+          service.start_server(id)
+          true
+        end
+
+        def start
+          requires :id
+          service.start_server(id)
+          true
+        end
+
+        def shutdown
+          requires :id
+          service.shutdown_server(id)
+          true
+        end
+
+        def poweroff
+          requires :id
+          service.poweroff_server(id)
+          true
+        end
+
+        def reboot
+          requires :id
+          service.reboot_server(id)
+          true
+        end
+
+        def reset
+          requires :id
+          service.reset_server(id)
+          true
         end
         
       end

@@ -28,6 +28,11 @@ module Fog
       request :update_datacenter
 
       request :get_server
+      request :start_server
+      request :shutdown_server
+      request :reboot_server
+      request :poweroff_server
+      request :reset_server
 
       request :list_images
       request :get_image
