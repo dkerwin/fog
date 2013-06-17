@@ -13,7 +13,7 @@ module Fog
 
           def end_element(name)
             case name
-            when 'serverName', 'creationTime', 'lastModificationTime', 'provisioningState', 'virtualMachineState',
+            when 'serverName', 'creationTime', 'lastModificationTime', 'provisioningState', 'virtualMachineState', 'requestId',
                  'cores', 'ram', 'internetAccess', 'connectedStorages', 'availabilityZone', 'romDrives', 'osType'
               @response[name] = value
             when 'ips'

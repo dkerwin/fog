@@ -3,7 +3,7 @@ module Fog
     module Compute
       module ProfitBricks
 
-        class CreateDatacenter < Fog::Parsers::Base
+        class GetDatacenter < Fog::Parsers::Base
 
           def reset
             @response = {}
@@ -11,7 +11,7 @@ module Fog
 
           def end_element(name)
             case name
-            when 'dataCenterId', 'region', 'requestId'
+            when 'dataCenterId', 'dataCenterName', 'dataCenterVersion', 'provisioningState', 'region'
               @response[name] = value
             end
           end

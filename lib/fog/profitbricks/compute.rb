@@ -5,8 +5,10 @@ module Fog
   module Compute
     class ProfitBricks < Fog::Service
 
-      requires :profitbricks_password, :profitbricks_username
-      recognizes :host, :port, :scheme, :persistent
+      API_URL = "https://api.profitbricks.com/"
+
+      requires :profitbricks_username, :profitbricks_password
+      recognizes :profitbricks_api_url, :persistent
 
       model_path 'fog/profitbricks/models/compute'
       model      :datacenter
@@ -56,14 +58,13 @@ module Fog
         def initialize(options={})
           require 'fog/core/parser'
 
-          @profitbricks_password = options[:profitbricks_password]
-          @profitbricks_username = options[:profitbricks_username]
-          @connection_options = options[:connection_options] || {:debug_request => true, :debug_response => true}
-          @host       = options[:host]        || "api.profitbricks.com"
-          @persistent = options[:persistent]  || false
-          @port       = options[:port]        || 443
-          @scheme     = options[:scheme]      || 'https'
-          @connection = Fog::Connection.new("#{@scheme}://#{@host}:#{@port}", @persistent, @connection_options)
+          @username = options[:profitbricks_username] || Fog.credentials[:profitbricks_username]
+          @password = options[:profitbricks_password] || Fog.credentials[:profitbricks_password]
+          @api_url  = options[:profitbricks_api_url]  || Fog.credentials[:profitbricks_api_url] || API_URL
+          @persistent = options[:persistent] || false
+          @connection_options = options[:connection_options] || {} #{:debug_request => true, :debug_response => true}
+
+          @connection = Fog::Connection.new(@api_url, @persistent, @connection_options)
         end
 
         def reload
@@ -71,7 +72,7 @@ module Fog
         end
 
         def request(params)
-          key = "#{@profitbricks_username}:#{@profitbricks_password}"
+          key = "#{@username}:#{@password}"
           params[:headers] = { "Authorization" => "Basic #{Base64.encode64(key).delete("\r\n")}", 
                                "Content-Type"  => "text/xml;charset=utf-8",
                                "Accept"        => "text/xml;charset=utf-8",
@@ -90,16 +91,22 @@ EOI
           params[:body] = body
 
           begin
-            response = @connection.request(params.merge!({:host => @host}))
-            puts "RESPONSE == #{response.body}"
+            response = @connection.request(params)
+            #puts "RESPONSE == #{response.body}"
           rescue Excon::Errors::HTTPStatusError => error
-            raise case error
-            when Excon::Errors::NotFound
-              Fog::Compute::ProfitBricks::NotFound.slurp(error)
+            if match = error.response.body.match(/(?:<faultCode>(.+)<\/faultCode>).*(?:<httpCode>(.*)<\/httpCode>).*(?:<message>(.*)<\/message>)/m)
+              
+              # match[1]: API fault code | match[2]: HTTP status code | match[3]: Error message 
+              raise case match[1]
+                when 'RESOURCE_NOT_FOUND'
+                  Fog::Compute::ProfitBricks::NotFound.slurp(error, "HTTP code #{match[2]} => #{match[1]}")
+                else
+                  Fog::Compute::ProfitBricks::Error.slurp(error, "#{match[1]} => #{match[3]}")
+                end
+              end
             else
               error
             end
-          end
 
           response
         end

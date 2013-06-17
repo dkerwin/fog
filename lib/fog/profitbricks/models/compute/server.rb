@@ -30,12 +30,14 @@ module Fog
         def save
           requires :name
           requires :region
-          p = service.create_datacenter(name, region).body
+          date = service.create_server(name, region)
+          merge_attributes(data.body)
+          true
         end
 
         def destroy
           requires :id
-          service.delete_datacenter(id)
+          service.delete_server(id)
           true
         end
 

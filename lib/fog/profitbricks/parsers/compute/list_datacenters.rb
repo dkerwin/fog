@@ -12,7 +12,7 @@ module Fog
 
           def end_element(name)
             case name
-            when 'dataCenterId', 'dataCenterName', 'dataCenterVersion'
+            when 'dataCenterId', 'dataCenterName', 'dataCenterVersion', 'requestId'
               @datacenter[name] = value
             when 'return'
               @response['datacenters'] << @datacenter

@@ -9,9 +9,8 @@ module Fog
 
         model Fog::Compute::ProfitBricks::Server
 
-        def all(id)
-          data = service.list_servers(id).body
-          load(data)
+        def all()
+          raise ArgumentError.new("Please use datacenters.get(DATACENTER_ID).servers instead")
         end
 
         def get(id)
