@@ -41,10 +41,21 @@ module Fog
           true
         end
 
+        ## FIXME: WIP
         def update
           requires :id
-          requires :name
-          service.update_datacenter(id, name)
+          options = {
+            :id => id
+            :name => name,
+            :cores => cores,
+            :ram => ram,
+            #:bootFromImageId => bootFromImageId
+            :zone => zone,
+            #:bootFromStorageId => bootFromStorageId
+            :type => type
+          }.delete_if {|k,v| v.nil? || v == "" }
+
+          service.update_server(options)
           true
         end
 
