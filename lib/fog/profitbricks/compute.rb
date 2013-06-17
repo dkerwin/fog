@@ -15,6 +15,8 @@ module Fog
       collection :datacenters
       model      :server
       collection :servers
+      model      :image
+      collection :images
 
       request_path 'fog/profitbricks/requests/compute'
       request :list_datacenters
@@ -26,6 +28,9 @@ module Fog
       request :update_datacenter
 
       request :get_server
+
+      request :list_images
+      request :get_image
 
       class Mock
 

@@ -3,7 +3,7 @@ module Fog
     class ProfitBricks
       class Real
 
-        require 'fog/profitbricks/parsers/compute/list_datacenters'
+        require 'fog/profitbricks/parsers/compute/get_image'
 
         # Boot a new server
         #
@@ -19,13 +19,13 @@ module Fog
         #     * 'server'<~Hash>:
         #       * 'id'<~String> - Id of the image
         #
-        def list_datacenters()
+        def get_image(id)
           request(
             :expects => 200,
             :method  => 'POST',
-            :parser  => Fog::Parsers::Compute::ProfitBricks::ListDatacenters.new,
+            :parser  => Fog::Parsers::Compute::ProfitBricks::GetImage.new,
             :path    => '/1.2',
-            :body    => '<ws:getAllDataCenters/>'
+            :body    => %Q{<ws:getImage><imageId>#{id}</imageId></ws:getImage>}
           )
         end
 
