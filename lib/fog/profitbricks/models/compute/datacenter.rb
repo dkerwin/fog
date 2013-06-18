@@ -13,6 +13,9 @@ module Fog
         attribute :state,    :aliases => 'provisioningState'
         attribute :region
 
+        attribute :servers
+        attribute :storages
+
         attribute :request_id, :aliases => 'requestId'
 
         def save

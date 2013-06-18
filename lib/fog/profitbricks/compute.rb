@@ -19,24 +19,33 @@ module Fog
       collection :images
 
       request_path 'fog/profitbricks/requests/compute'
-      request :list_datacenters
 
+      ## Datacenter
+      request :list_datacenters
       request :get_datacenter
       request :create_datacenter
       request :delete_datacenter
       request :clear_datacenter
       request :update_datacenter
 
+      ## Server
       request :get_server
       request :delete_server
+      request :update_server
+      request :create_server
       request :start_server
       request :shutdown_server
       request :reboot_server
       request :poweroff_server
       request :reset_server
 
+      ## Image
       request :list_images
       request :get_image
+
+      ## Storage
+
+      ## Loadbalancer
 
       class Mock
 
@@ -73,7 +82,7 @@ module Fog
           @password = options[:profitbricks_password] || Fog.credentials[:profitbricks_password]
           @api_url  = options[:profitbricks_api_url]  || Fog.credentials[:profitbricks_api_url] || API_URL
           @persistent = options[:persistent] || false
-          @connection_options = options[:connection_options] || {} #{:debug_request => true, :debug_response => true}
+          @connection_options = options[:connection_options] || {:debug_request => true, :debug_response => true}
 
           @connection = Fog::Connection.new(@api_url, @persistent, @connection_options)
         end
@@ -103,21 +112,35 @@ EOI
 
           begin
             response = @connection.request(params)
-            #puts "RESPONSE == #{response.body}"
           rescue Excon::Errors::HTTPStatusError => error
-            if match = error.response.body.match(/(?:<faultCode>(.+)<\/faultCode>).*(?:<httpCode>(.*)<\/httpCode>).*(?:<message>(.*)<\/message>)/m)
-              
-              # match[1]: API fault code | match[2]: HTTP status code | match[3]: Error message 
-              raise case match[1]
-                when 'RESOURCE_NOT_FOUND'
-                  Fog::Compute::ProfitBricks::NotFound.slurp(error, "HTTP code #{match[2]} => #{match[1]}")
-                else
-                  Fog::Compute::ProfitBricks::Error.slurp(error, "#{match[1]} => #{match[3]}")
-                end
+            errors = { :http_code => error.response.status, :fault_code => nil, :fault => nil, :message => nil }
+            parser = { :http => /(?:<httpCode>(\d+)<\/httpCode>)/,
+                       :fault_code => /(?:<faultCode>(.+)<\/faultCode>)/,
+                       :fault => /(?:<faultstring>(.+)<\/faultstring>)/,
+                       :message => /(?:<message>(.*)<\/message>)/
+                     }
+
+            parser.each do |type, rx|
+              if match = error.response.body.match(rx)
+                errors[type] = match[1]
               end
-            else
-              error
             end
+
+            if errors[:message]
+              m = errors[:message]
+            else
+              m = errors[:fault]
+            end
+
+            message = "HTTP error #{errors[:http_code]} => #{errors[:fault_code]}: #{m}"
+
+            raise case  errors[:fault]
+            when 'RESOURCE_NOT_FOUND'
+              Fog::Compute::ProfitBricks::NotFound.slurp(error, message)
+            else
+              Fog::Compute::ProfitBricks::Error.slurp(error, message)
+            end
+          end
 
           response
         end
