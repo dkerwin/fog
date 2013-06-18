@@ -17,6 +17,8 @@ module Fog
       collection :servers
       model      :image
       collection :images
+      model      :disk
+      collection :disks
 
       request_path 'fog/profitbricks/requests/compute'
 
@@ -44,6 +46,12 @@ module Fog
       request :get_image
 
       ## Storage
+      request :get_storage
+      request :update_storage
+      request :delete_storage
+      request :create_storage
+      request :connect_storage
+      request :disconnect_storage
 
       ## Loadbalancer
 
@@ -82,7 +90,8 @@ module Fog
           @password = options[:profitbricks_password] || Fog.credentials[:profitbricks_password]
           @api_url  = options[:profitbricks_api_url]  || Fog.credentials[:profitbricks_api_url] || API_URL
           @persistent = options[:persistent] || false
-          @connection_options = options[:connection_options] || {:debug_request => true, :debug_response => true}
+          #@connection_options = options[:connection_options] || {:debug_request => true, :debug_response => true}
+          @connection_options = {:debug_request => true, :debug_response => true}
 
           @connection = Fog::Connection.new(@api_url, @persistent, @connection_options)
         end

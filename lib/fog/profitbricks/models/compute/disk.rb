@@ -1,64 +1,50 @@
-require 'fog/compute/models/server'
+require 'fog/core/model'
 
 module Fog
   module Compute
     class ProfitBricks
+      class Disk < Fog::Model
 
-      class Server < Fog::Compute::Server
-
-        identity  :id,                   :aliases => 'serverId'
+        identity  :id,                   :aliases => 'storageId'
         
-        attribute :name,                 :aliases => 'serverName'
+        attribute :name,                 :aliases => 'storageName'
         attribute :created,              :aliases => 'creationTime'
         attribute :modified,             :aliases => 'lastModificationTime'
         attribute :state,                :aliases => 'provisioningState'
-        attribute :zone,                 :aliases => 'availabilityZone'
+
+        attribute :size,                 :aliases => 'size', :type => :integer
+        attribute :image,                :aliases => 'mountImage'
+        attribute :image_id,             :aliases => 'mountImageId'
+        attribute :image_password,       :aliases => 'profitBricksImagePassword'
+        attribute :bus_type,             :aliases => 'busType'
+
         attribute :os_type,              :aliases => 'osType'
         
-        attribute :vm_state,             :aliases => 'virtualMachineState'
-        attribute :cores,                :aliases => 'cores', :type => :integer
-        attribute :ram,                  :aliases => 'ram', :type => :integer
-
-        attribute :online,               :aliases => 'internetAccess', :type => :boolean
-        attribute :ips,                  :type => :array
-        attribute :lan_id,               :aliases => 'lanId', :type => :integer
-
-        attribute :storage_ids,          :aliases => 'storageId', :type => :array
-        attribute :rom_drives,           :aliases => 'romDrives'
-
-        attribute :boot_from_image_id,   :aliases => 'bootFromImageId'
-        attribute :boot_from_storage_id, :aliases => 'bootFromStorageId'
-
+        attribute :server_id,            :aliases => 'serverId'
         attribute :datacenter_id,        :aliases => 'dataCenterId'
         attribute :request_id,           :aliases => 'requestId'
 
         def save
-          requires :cores
-          requires :ram
+          requires :size
 
           options = {
-            :cores => cores,
-            :ram => ram,
-            :datacenter_id => datacenter_id,
-            :name => name,
-            :boot_from_image_id => boot_from_image_id,
-            :boot_from_storage_id => boot_from_storage_id,
-            :lan_id => lan_id,
-            :online => online,
-            :zone => zone,
-            :os_type => os_type,
+            :size           => size,
+            :name           => name,
+            :datacenter_id  => datacenter_id,
+            :image_id       => image_id,
+            :image_password => image_password,
           }.delete_if {|k,v| v.nil? || v == "" }
 
           options = Hash[options.map { |k, v| [attr_translate[k], v] if attr_translate.has_key? k }]
 
-          data = service.create_server(options)
+          data = service.create_storage(options)
           merge_attributes(data.body)
           true
         end
 
         def destroy
           requires :id
-          service.delete_server(id)
+          service.delete_storage(id)
           true
         end
 
@@ -68,15 +54,36 @@ module Fog
           options.merge!(id: id)
 
           ## Get the aliases from class method and switch hash keys
+          #attr_translation = self.class.aliases.invert
           options = Hash[options.map { |k, v| [attr_translate[k], v] }]
 
-          service.update_server(options)
+          service.update_storage(options)
           true
         end
 
-        def clear
+        def connect(options={})
           requires :id
-          service.clear_datacenter(id)
+          options.merge!(id: id)
+
+          raise ArgumentError.new('Missing server_id') if options[:server_id].nil?
+
+          ## Get the aliases from class method and switch hash keys
+          options = Hash[options.map { |k, v| [attr_translate[k], v] }]
+
+          service.connect_storage(options)
+          true
+        end
+
+        def disconnect(options={})
+          requires :id
+          options.merge!(id: id)
+
+          raise ArgumentError.new('Missing server_id') if options[:server_id].nil?
+
+          ## Get the aliases from class method and switch hash keys
+          options = Hash[options.map { |k, v| [attr_translate[k], v] }]
+
+          service.disconnect_storage(options)
           true
         end
 
