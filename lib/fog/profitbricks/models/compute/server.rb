@@ -1,10 +1,13 @@
 require 'fog/compute/models/server'
+require 'fog/profitbricks/models/compute/base'
 
 module Fog
   module Compute
     class ProfitBricks
 
       class Server < Fog::Compute::Server
+
+        include Fog::Compute::ProfitBricks::Base
 
         identity  :id,                   :aliases => 'serverId'
         
@@ -33,20 +36,19 @@ module Fog
         attribute :request_id,           :aliases => 'requestId'
 
         def save
-          requires :cores
-          requires :ram
+          requires :cores, :ram
 
           options = {
-            :cores => cores,
-            :ram => ram,
-            :datacenter_id => datacenter_id,
-            :name => name,
-            :boot_from_image_id => boot_from_image_id,
+            :cores                => cores,
+            :ram                  => ram,
+            :datacenter_id        => datacenter_id,
+            :name                 => name,
+            :boot_from_image_id   => boot_from_image_id,
             :boot_from_storage_id => boot_from_storage_id,
-            :lan_id => lan_id,
-            :online => online,
-            :zone => zone,
-            :os_type => os_type,
+            :lan_id               => lan_id,
+            :online               => online,
+            :zone                 => zone,
+            :os_type              => os_type,
           }.delete_if {|k,v| v.nil? || v == "" }
 
           options = Hash[options.map { |k, v| [attr_translate[k], v] if attr_translate.has_key? k }]

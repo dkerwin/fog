@@ -17,13 +17,13 @@ module Fog
         #     * 'server'<~Hash>:
         #       * 'id'<~String> - Id of the image
         #
-        def create_datacenter(name, region)
+        def create_datacenter(options)
           request(
             :expects => 200,
             :method  => 'POST',
             :path    => '/1.2',
             :parser  => Fog::ToHashDocument.new,
-            :body    => %Q{<ws:createDataCenter><dataCenterName>#{name}</dataCenterName><region>#{region}</region></ws:createDataCenter>}
+            :body    => %Q{<ws:createDataCenter>#{options.map {|k,v| "<#{k}>#{v}</#{k}>" }.join}</ws:createDataCenter>}
           )
         end
 

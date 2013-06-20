@@ -13,8 +13,8 @@ module Fog
       model_path 'fog/profitbricks/models/compute'
       model      :datacenter
       collection :datacenters
-      model      :loadbalancer
-      collection :loadbalancers
+      #model      :loadbalancer
+      #collection :loadbalancers
       model      :server
       collection :servers
       model      :image
@@ -56,7 +56,7 @@ module Fog
       request :disconnect_storage
 
       ## Loadbalancer
-      request :get_loadbalancer
+      #request :get_loadbalancer
 
       class Mock
 

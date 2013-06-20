@@ -1,4 +1,5 @@
 require 'fog/core/model'
+require 'fog/profitbricks/models/compute/base'
 
 module Fog
   module Compute
@@ -6,12 +7,14 @@ module Fog
 
       class Datacenter < Fog::Model
 
+        include Fog::Compute::ProfitBricks::Base
+
         identity  :id,            :aliases => :dataCenterId
         
         attribute :name,          :aliases => :dataCenterName
         attribute :version,       :aliases => :dataCenterVersion
         attribute :state,         :aliases => :provisioningState
-        attribute :region
+        attribute :region,        :aliases => :region
 
         attribute :servers
         attribute :storages
@@ -19,16 +22,17 @@ module Fog
 
         attribute :request_id,    :aliases => :requestId
 
-        def save
+        def save(options={})
           requires :name, :region
-          data = service.create_datacenter(name, region)
-          merge_attributes(data.body)
-          true
-        end
 
-        def destroy
-          requires :id
-          service.delete_datacenter(id)
+          options.merge!(name: name, region: region)
+          raise ArgumentError.new("Unknown region '#{region}'") unless ['NORTH_AMERICA', 'EUROPE', 'DEFAULT'].include? options[:region]
+
+          ## Get the aliases from class method and switch hash keys
+          options = Hash[options.map { |k, v| [attr_translate[k], v] }]
+          
+          data = service.create_datacenter(options)
+          merge_attributes(data.body)
           true
         end
 
@@ -44,6 +48,12 @@ module Fog
           true
         end
 
+        def destroy
+          requires :id
+          service.delete_datacenter(id)
+          true
+        end
+
         def clear
           requires :id
           service.clear_datacenter(id)
@@ -52,10 +62,6 @@ module Fog
 
         def ready?
           self.state == 'AVAILABLE'
-        end
-
-        def attr_translate
-          self.class.aliases.invert
         end
 
         ## Ensure some attributes are arrays if only a single result is returned.
