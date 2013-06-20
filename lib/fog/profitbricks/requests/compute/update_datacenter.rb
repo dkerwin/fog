@@ -17,12 +17,13 @@ module Fog
         #     * 'server'<~Hash>:
         #       * 'id'<~String> - Id of the image
         #
-        def update_datacenter(id, name)
+        def update_datacenter(options)
           request(
             :expects => 200,
             :method  => 'POST',
             :path    => '/1.2',
-            :body    => %Q{<ws:updateDataCenter><dataCenterId>#{id}</dataCenterId><dataCenterName>#{name}</dataCenterName></ws:updateDataCenter>}
+            :parser  => Fog::ToHashDocument.new,
+            :body    => %Q{<ws:updateDataCenter><arg0>#{options.map {|k,v| "<#{k}>#{v}</#{k}>" }.join}</arg0></ws:updateDataCenter>}
           )
         end
 

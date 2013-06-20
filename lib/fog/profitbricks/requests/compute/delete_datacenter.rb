@@ -22,6 +22,7 @@ module Fog
             :expects => 200,
             :method  => 'POST',
             :path    => '/1.2',
+            :parser  => Fog::ToHashDocument.new,
             :body    => %Q{<ws:deleteDataCenter><dataCenterId>#{id}</dataCenterId></ws:deleteDataCenter>}
           )
         end

@@ -3,6 +3,8 @@ module Fog
     class ProfitBricks
       class Real
 
+        require 'fog/profitbricks/parsers/compute/get_loadbalancer'
+
         # Boot a new server
         #
         # ==== Parameters
@@ -17,13 +19,13 @@ module Fog
         #     * 'server'<~Hash>:
         #       * 'id'<~String> - Id of the image
         #
-        def list_datacenters
+        def get_loadbalancer(id)
           request(
             :expects => 200,
             :method  => 'POST',
-            :parser  => Fog::ToHashDocument.new,
+            :parser  => Fog::Parsers::Compute::ProfitBricks::GetLoadbalancer.new,
             :path    => '/1.2',
-            :body    => '<ws:getAllDataCenters/>'
+            :body    => %Q{<ws:getLoadBalancer><loadBalancerId>#{id}</loadBalancerId></ws:getLoadBalancer>}
           )
         end
 

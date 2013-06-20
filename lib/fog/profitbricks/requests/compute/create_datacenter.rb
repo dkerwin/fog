@@ -3,8 +3,6 @@ module Fog
     class ProfitBricks
       class Real
 
-        require 'fog/profitbricks/parsers/compute/create_datacenter'
-
         # Boot a new server
         #
         # ==== Parameters
@@ -23,8 +21,8 @@ module Fog
           request(
             :expects => 200,
             :method  => 'POST',
-            :parser  => Fog::Parsers::Compute::ProfitBricks::CreateDatacenter.new,
             :path    => '/1.2',
+            :parser  => Fog::ToHashDocument.new,
             :body    => %Q{<ws:createDataCenter><dataCenterName>#{name}</dataCenterName><region>#{region}</region></ws:createDataCenter>}
           )
         end

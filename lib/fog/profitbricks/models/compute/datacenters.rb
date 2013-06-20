@@ -10,7 +10,7 @@ module Fog
         model Fog::Compute::ProfitBricks::Datacenter
 
         def all
-          data = service.list_datacenters.body['datacenters']
+          data = service.list_datacenters.body
           load(data)
         end
 

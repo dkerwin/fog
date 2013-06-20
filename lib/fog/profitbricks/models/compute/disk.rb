@@ -65,7 +65,7 @@ module Fog
           requires :id
           options.merge!(id: id)
 
-          raise ArgumentError.new('Missing server_id') if options[:server_id].nil?
+          raise ArgumentError.new('Missing key :server_id') if options[:server_id].nil?
 
           ## Get the aliases from class method and switch hash keys
           options = Hash[options.map { |k, v| [attr_translate[k], v] }]
@@ -78,7 +78,7 @@ module Fog
           requires :id
           options.merge!(id: id)
 
-          raise ArgumentError.new('Missing server_id') if options[:server_id].nil?
+          raise ArgumentError.new('Missing key :server_id') if options[:server_id].nil?
 
           ## Get the aliases from class method and switch hash keys
           options = Hash[options.map { |k, v| [attr_translate[k], v] }]
@@ -91,48 +91,8 @@ module Fog
           self.state == 'AVAILABLE'
         end
 
-        def running?
-          self.vm_state == 'RUNNING'
-        end
-
         def ready?
-          self.provisioned? and self.running?
-        end
-
-        def start
-          requires :id
-          service.start_server(id)
-          true
-        end
-
-        def start
-          requires :id
-          service.start_server(id)
-          true
-        end
-
-        def shutdown
-          requires :id
-          service.shutdown_server(id)
-          true
-        end
-
-        def poweroff
-          requires :id
-          service.poweroff_server(id)
-          true
-        end
-
-        def reboot
-          requires :id
-          service.reboot_server(id)
-          true
-        end
-
-        def reset
-          requires :id
-          service.reset_server(id)
-          true
+          self.provisioned?
         end
 
         private
