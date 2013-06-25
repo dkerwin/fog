@@ -18,7 +18,7 @@ module Fog
 
         attribute :servers
         attribute :storages
-        attribute :loadbalancers, :aliases => :loadBalancers
+        attribute :loadbalancers
 
         attribute :request_id,    :aliases => :requestId
 
@@ -64,11 +64,17 @@ module Fog
           self.state == 'AVAILABLE'
         end
 
-        ## Ensure some attributes are arrays if only a single result is returned.
+        ## Manual sqash for servers, storages and loadbalancers. Return entire hash
+        ## and aliases in subkeys don't work. Will return array of *id's.
         ## Methods are dynamically created
-        [:servers, :storages, :loadbalancers].each do |attr|
-          define_method "#{attr}" do 
-            [attributes[attr]].flatten unless attributes[attr].nil?
+        [[:servers, :serverId], [:storages, :storageId], [:loadbalancers, :loadBalancerId]].each do |attr|
+          define_method "#{attr[0]}" do
+            result = []
+            return [] if attributes[attr[0]].nil?
+            [attributes[attr[0]]].flatten.each do |a|
+              result << a[attr[1]]
+            end
+            result
           end
         end
 
