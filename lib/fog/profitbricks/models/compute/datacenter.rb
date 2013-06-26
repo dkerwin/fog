@@ -18,7 +18,7 @@ module Fog
 
         attribute :servers
         attribute :storages
-        attribute :loadbalancers
+        attribute :loadbalancers, :aliases => :loadBalancers
 
         attribute :request_id,    :aliases => :requestId
 
@@ -70,7 +70,10 @@ module Fog
         [[:servers, :serverId], [:storages, :storageId], [:loadbalancers, :loadBalancerId]].each do |attr|
           define_method "#{attr[0]}" do
             result = []
-            return [] if attributes[attr[0]].nil?
+
+            ## Return empty result if response im empty
+            return result if attributes[attr[0]].nil?
+
             [attributes[attr[0]]].flatten.each do |a|
               result << a[attr[1]]
             end

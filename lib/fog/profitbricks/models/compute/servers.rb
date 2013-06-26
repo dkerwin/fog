@@ -10,7 +10,7 @@ module Fog
         model Fog::Compute::ProfitBricks::Server
 
         def all
-          raise NotImplementedError.new("Please use datacenters.get(DATACENTER_ID).servers instead")
+          raise NotImplementedError.new("Please call datacenters.get(DATACENTER_ID).servers instead")
         end
 
         def get(id)

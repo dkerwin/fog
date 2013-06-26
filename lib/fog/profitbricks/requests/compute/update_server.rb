@@ -22,6 +22,7 @@ module Fog
             :expects => 200,
             :method  => 'POST',
             :path    => '/1.2',
+            :parser  => Fog::ToHashDocument.new,
             :body    => %Q{<ws:updateServer><arg0>#{options.map {|k,v| "<#{k}>#{v}</#{k}>" }.join}</arg0></ws:updateServer>}
           )
         end
