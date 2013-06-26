@@ -10,7 +10,7 @@ module Fog
         model Fog::Compute::ProfitBricks::Image
 
         def all
-          data = service.list_images.body['images']
+          data = service.list_images.body
           load(data)
         end
 

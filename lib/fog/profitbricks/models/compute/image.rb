@@ -6,22 +6,36 @@ module Fog
 
       class Image < Fog::Model
 
-        identity  :id,          :aliases => 'imageId'
+        identity  :id,          :aliases => :imageId
 
-        attribute :name,        :aliases => 'imageName'
-        attribute :type,        :aliases => 'imageType'
-        attribute :writeable
+        attribute :name,        :aliases => :imageName
+        attribute :type,        :aliases => :imageType
+        attribute :writeable,   :type => :boolean
         attribute :region
 
-        attribute :cpu_hotplug, :aliases => 'cpuHotpluggable'
-        attribute :mem_hotplug, :aliases => 'memoryHotpluggable'
-        attribute :server_ids,  :aliases => 'serverIds'
+        attribute :cpu_hotplug, :aliases => :cpuHotpluggable, :type => :boolean
+        attribute :mem_hotplug, :aliases => :memoryHotpluggable, :type => :boolean
+        attribute :server_ids,  :aliases => :serverIds
                 
-        attribute :request_id,  :aliases => 'requestId'
+        attribute :request_id,  :aliases => :requestId
 
         def set_os_type
           raise Fog::Errors::NotImplemented.new("Please implement the #set_os_type method")
-        end          
+        end
+
+        [[:server_ids, :serverIds]].each do |attr|
+          define_method "#{attr[0]}" do
+            result = []
+
+            ## Return empty result if response im empty
+            return result if attributes[attr[0]].nil?
+
+            [attributes[attr[0]]].flatten.each do |a|
+              result << a[attr[1]]
+            end
+            result
+          end
+        end
                 
       end
 

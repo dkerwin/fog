@@ -3,8 +3,6 @@ module Fog
     class ProfitBricks
       class Real
 
-        require 'fog/profitbricks/parsers/compute/list_images'
-
         # Boot a new server
         #
         # ==== Parameters
@@ -23,7 +21,7 @@ module Fog
           request(
             :expects => 200,
             :method  => 'POST',
-            :parser  => Fog::Parsers::Compute::ProfitBricks::ListImages.new,
+            :parser  => Fog::ToHashDocument.new,
             :path    => '/1.2',
             :body    => '<ws:getAllImages/>'
           )
