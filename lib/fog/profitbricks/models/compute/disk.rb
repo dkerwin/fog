@@ -5,24 +5,26 @@ module Fog
     class ProfitBricks
       class Disk < Fog::Model
 
-        identity  :id,                   :aliases => 'storageId'
-        
-        attribute :name,                 :aliases => 'storageName'
-        attribute :created,              :aliases => 'creationTime'
-        attribute :modified,             :aliases => 'lastModificationTime'
-        attribute :state,                :aliases => 'provisioningState'
+        include Fog::Compute::ProfitBricks::Base
 
-        attribute :size,                 :aliases => 'size', :type => :integer
-        attribute :image,                :aliases => 'mountImage'
-        attribute :image_id,             :aliases => 'mountImageId'
-        attribute :image_password,       :aliases => 'profitBricksImagePassword'
-        attribute :bus_type,             :aliases => 'busType'
-
-        attribute :os_type,              :aliases => 'osType'
+        identity  :id,                   :aliases => :storageId
         
-        attribute :server_id,            :aliases => 'serverId'
-        attribute :datacenter_id,        :aliases => 'dataCenterId'
-        attribute :request_id,           :aliases => 'requestId'
+        attribute :name,                 :aliases => :storageName
+        attribute :created,              :aliases => :creationTime
+        attribute :modified,             :aliases => :lastModificationTime
+        attribute :state,                :aliases => :provisioningState
+
+        attribute :size,                 :aliases => :size, :type => :integer
+        attribute :image_id,             :aliases => :mountImage, :squash => :imageId
+        attribute :image_password,       :aliases => :profitBricksImagePassword
+        attribute :bus_type,             :aliases => :busType
+
+        attribute :os_type,              :aliases => :osType
+        
+        attribute :server,               :aliases => :serverIds
+        attribute :server_id,            :aliases => :serverId
+        attribute :datacenter_id,        :aliases => :dataCenterId
+        attribute :request_id,           :aliases => :requestId
 
         def save
           requires :size
@@ -93,12 +95,6 @@ module Fog
 
         def ready?
           self.provisioned?
-        end
-
-        private
-
-        def attr_translate
-          self.class.aliases.invert
         end
         
       end

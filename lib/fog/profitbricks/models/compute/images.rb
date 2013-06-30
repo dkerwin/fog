@@ -9,8 +9,9 @@ module Fog
 
         model Fog::Compute::ProfitBricks::Image
 
-        def all
+        def all(filters = {})
           data = service.list_images.body
+          data = data.find_all { |image| (filters.to_a - image.to_a).empty? }
           load(data)
         end
 

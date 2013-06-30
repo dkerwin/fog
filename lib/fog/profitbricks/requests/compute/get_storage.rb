@@ -3,8 +3,6 @@ module Fog
     class ProfitBricks
       class Real
 
-        require 'fog/profitbricks/parsers/compute/get_storage'
-
         # Boot a new server
         #
         # ==== Parameters
@@ -23,7 +21,7 @@ module Fog
           request(
             :expects => 200,
             :method  => 'POST',
-            :parser  => Fog::Parsers::Compute::ProfitBricks::GetStorage.new,
+            :parser  => Fog::ToHashDocument.new,
             :path    => '/1.2',
             :body    => %Q{<ws:getStorage><storageId>#{id}</storageId></ws:getStorage>}
           )

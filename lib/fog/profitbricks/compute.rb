@@ -124,8 +124,8 @@ EOI
 
           begin
             response = @connection.request(params)
-            #puts "RESPONSE == #{response.inspect}"
           rescue Excon::Errors::HTTPStatusError => error
+            #puts "RESP BODY == #{error.response.body}"
             errors = { :http_code => error.response.status, :fault_code => nil, :fault => nil, :message => nil }
             parser = { :http => /(?:<httpCode>(\d+)<\/httpCode>)/,
                        :fault_code => /(?:<faultCode>(.+)<\/faultCode>)/,

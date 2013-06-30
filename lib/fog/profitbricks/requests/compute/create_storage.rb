@@ -3,8 +3,6 @@ module Fog
     class ProfitBricks
       class Real
 
-        require 'fog/profitbricks/parsers/compute/create_storage'
-
         # Boot a new server
         #
         # ==== Parameters
@@ -23,8 +21,8 @@ module Fog
           request(
             :expects => 200,
             :method  => 'POST',
-            :parser  => Fog::Parsers::Compute::ProfitBricks::CreateStorage.new,
             :path    => '/1.2',
+            :parser  => Fog::ToHashDocument.new,
             :body    => %Q{<ws:createStorage><arg0>#{options.map {|k,v| "<#{k}>#{v}</#{k}>" }.join}</arg0></ws:createStorage>}
           )
         end
